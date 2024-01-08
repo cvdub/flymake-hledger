@@ -50,6 +50,9 @@ See URL `https://hledger.org/1.30/hledger.html#check' for the meaning of each ch
           (const "tags")
           (const "uniqueleafnames")))
 
+(defcustom flymake-hledger-check-ledger-binary-path t
+  "Ensure that ledger-binary-path ends in \"hledger\" before enabling flycheck-hledger.")
+
 (defvar-local flymake-hledger--process nil
   "The process executing hledger for the current buffer.")
 
@@ -85,8 +88,9 @@ REPORT-FN is Flymake's callback."
    (derived-mode-p 'hledger-mode)
    ;; or the user is using `ledger-mode' with the binary path pointing
    ;; to "hledger":
-   (and (bound-and-true-p ledger-binary-path)
-        (string-suffix-p "hledger" ledger-binary-path))))
+   (or (not flymake-hledger-check-ledger-binary-path)
+       (and (bound-and-true-p ledger-binary-path)
+            (string-suffix-p "hledger" ledger-binary-path)))))
 
 (defun flymake-hledger--start-hledger-process (report-fn)
   "Start hledger and report problems through REPORT-FN.
